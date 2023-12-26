@@ -14,12 +14,9 @@ class CourseViewSet(viewsets.ModelViewSet):
     serializer_class = CourseSerializer
     queryset = Course.objects.all()
 
-    def create(self, request, *args, **kwargs):       # Функция привязывает автора к его курсу
-        self.serializer_class = CourseCreateSerializer
-        new_course = super().create(request, *args, **kwargs)
-        new_course.author = self.request.user
-        new_course.save()
-        return new_course
+    def perform_create(self, serializer):       # Функция привязывает автора к его курсу
+        serializer.save()
+        self.request.user.course_set.add(serializer.instance)
 
     # Если user - не модератор, то функция показывает только его курсы
     def get_queryset(self):
@@ -33,7 +30,7 @@ class LessonListAPIView(ListAPIView):
     """ Отображение списка сущностей (Generic-класс)"""
     serializer_class = LessonSerializer
     queryset = Lesson.objects.all()
-    permission_classes = [IsAuthor]
+    permission_classes = [IsManager | IsAuthor]
 
 
 class LessonRetrieveAPIView(RetrieveAPIView):
@@ -47,7 +44,7 @@ class LessonCreateAPIView(CreateAPIView):
     """ Создание сущности (Generic-класс)"""
     serializer_class = LessonSerializer
     queryset = Lesson.objects.all()
-    permission_classes = [IsManager]
+    permission_classes = [IsManager | IsAuthor]
 
     def perform_create(self, serializer):     # Функция привязывает автора к его уроку
         new_lesson = serializer.save()
