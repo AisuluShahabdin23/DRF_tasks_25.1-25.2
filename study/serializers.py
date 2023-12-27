@@ -6,7 +6,7 @@ class LessonCourseSerializer(serializers.ModelSerializer):
     """ Cериализатор для Course, который будет включать данные об уроках """
     class Meta:
         model = Lesson
-        fields = ('pk', 'title_course',)
+        fields = ('pk', 'title_lesson',)
 
 
 class CourseCreateSerializer(serializers.ModelSerializer):
